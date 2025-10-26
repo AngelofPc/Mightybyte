@@ -1,2 +1,3 @@
 # Mightybyte
-Created with CodeSandbox
+
+Mightybyte submission for Olugbenga. A.
