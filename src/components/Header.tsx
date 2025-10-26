@@ -30,8 +30,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuPress }: HeaderProps) => {
     <View style={styles.container}>
       <View style={styles.leftContainer}>
         <Pressable onPress={onMenuPress} style={styles.menuButton}>
-          <Icon name="youtube" size={24} color="red" />
+          <Icon name="menu" size={24} color="#606060" />
         </Pressable>
+        <Icon name="youtube" size={24} color="red" />
         <Text style={styles.logoText}>YouTube</Text>
       </View>
       <View style={styles.centerContainer}>
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#cccccc',
+
     overflow: 'hidden',
   },
   searchInput: {
