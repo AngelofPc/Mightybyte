@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Pressable,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
 import Icon from './Icon';
 
 interface HeaderProps {
@@ -18,12 +11,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuPress }: HeaderProps) => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      console.log('Searching for:', searchQuery);
+      // Search functionality would be implemented here
     }
   };
 
   const handleVoiceSearch = () => {
-    console.log('Voice search activated');
+    // Voice search functionality would be implemented here
   };
 
   return (
@@ -92,15 +85,6 @@ const styles = StyleSheet.create({
     padding: 8,
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 16,
-  },
-  logoIcon: {
-    width: 28,
-    height: 28,
   },
   logoText: {
     fontSize: 20,

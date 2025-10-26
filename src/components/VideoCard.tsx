@@ -50,7 +50,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onHover }) => {
       if (onHover) {
         onHover(video, cardRef.current);
       }
-    }, 200);
+    }, 300);
   };
 
   const handleHoverOut = () => {
@@ -69,41 +69,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onHover }) => {
     return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
   };
 
-  const formatViews = (views: number) => {
-    if (views >= 1000000) {
-      return `${(views / 1000000).toFixed(1)}M views`;
-    }
-    if (views >= 1000) {
-      return `${(views / 1000).toFixed(0)}K views`;
-    }
-    return `${views} views`;
-  };
-
-  const timeSince = (date: Date) => {
-    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-    let interval = seconds / 31536000;
-    if (interval > 1) {
-      return `${Math.floor(interval)} years ago`;
-    }
-    interval = seconds / 2592000;
-    if (interval > 1) {
-      return `${Math.floor(interval)} months ago`;
-    }
-    interval = seconds / 86400;
-    if (interval > 1) {
-      return `${Math.floor(interval)} days ago`;
-    }
-    interval = seconds / 3600;
-    if (interval > 1) {
-      return `${Math.floor(interval)} hours ago`;
-    }
-    interval = seconds / 60;
-    if (interval > 1) {
-      return `${Math.floor(interval)} minutes ago`;
-    }
-    return `${Math.floor(seconds)} seconds ago`;
-  };
-
   const getAvatarImage = (videoId: string) => {
     const index = parseInt(videoId) % avatarImages.length;
     return avatarImages[index];
@@ -118,12 +83,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onHover }) => {
     >
       <View style={styles.thumbnailContainer}>
         <Image source={{ uri: video.thumbnail }} style={styles.thumbnail} />
-
-        {video.duration && !video.isLive && (
-          <View style={styles.durationBadge}>
-            <Text style={styles.durationText}>{video.duration}</Text>
-          </View>
-        )}
       </View>
       <View style={styles.infoContainer}>
         <Image
@@ -141,15 +100,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onHover }) => {
             )}
           </View>
           <Text style={styles.publishedDate}>
-            {video.isLive
-              ? `${video.liveViewers} watching`
-              : `${formatViews(video.views)} • ${timeSince(video.publishedAt)}`}
+            {formatDate(video.publishedAt)}
           </Text>
-          {video.isLive && (
-            <View style={styles.liveBadge}>
-              <Text style={styles.liveText}>LIVE NOW</Text>
-            </View>
-          )}
         </View>
       </View>
     </Pressable>
@@ -208,43 +160,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#606060',
   },
-  liveBadge: {
-    marginTop: 8,
-    borderColor: '#ff0000',
-    borderWidth: 1,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    alignSelf: 'flex-start',
-  },
-  liveText: {
-    color: 'red',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  durationBadge: {
-    position: 'absolute',
-    bottom: 8,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  durationText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '500',
-  },
   channelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 2,
-  },
-  verifiedIcon: {
-    color: '#606060',
-    fontSize: 12,
-    marginLeft: 4,
   },
 });
 

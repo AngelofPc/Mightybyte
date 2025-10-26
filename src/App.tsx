@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -16,20 +16,28 @@ const App = () => {
   const isDesktop = width > 768;
 
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('programming');
 
   const toggleSidebar = useCallback(() => {
     setSidebarCollapsed((prev: boolean) => !prev);
   }, []);
+
+  const handleCategoryChange = (query: string) => {
+    setSearchQuery(query);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Header onMenuPress={toggleSidebar} />
         <View style={styles.row}>
-          <Sidebar isCollapsed={isSidebarCollapsed} />
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            onItemPress={handleCategoryChange}
+          />
           <View style={styles.mainContent}>
-            <CategoryFilters />
-            <VideoGrid />
+            <CategoryFilters onCategoryChange={handleCategoryChange} />
+            <VideoGrid searchQuery={searchQuery} />
           </View>
         </View>
       </View>

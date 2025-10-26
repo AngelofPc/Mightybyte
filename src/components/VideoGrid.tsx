@@ -1,15 +1,89 @@
-import React, { useState, useRef } from 'react';
-import { View, FlatList, StyleSheet, useWindowDimensions } from 'react-native';
-import { videos } from '../data/videos';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  useWindowDimensions,
+  Animated,
+} from 'react-native';
 import VideoCard from './VideoCard';
 import VideoHoverPopup from './VideoHoverPopup';
+import { fetchVideos, YouTubeVideo } from '../services/youtubeApi';
 
-const VideoGrid: React.FC = () => {
+interface VideoGridProps {
+  searchQuery: string;
+}
+
+const VideoGrid: React.FC<VideoGridProps> = ({ searchQuery }) => {
   const { width } = useWindowDimensions();
+  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
+  const [nextPageToken, setNextPageToken] = useState<string | undefined>();
+  const [loading, setLoading] = useState(false);
   const [hoveredVideo, setHoveredVideo] = useState<any>(null);
   const [hoveredCardRef, setHoveredCardRef] = useState<any>(null);
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const popupOpacity = useRef(new Animated.Value(0)).current;
+  const popupScale = useRef(new Animated.Value(0.85)).current;
   const gridRef = useRef<View>(null);
+
+  useEffect(() => {
+    loadVideos(true);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (hoveredVideo && hoveredCardRef) {
+        setTimeout(() => {
+          if (hoveredCardRef && gridRef.current) {
+            hoveredCardRef.measureInWindow(
+              (x: number, y: number, width: number, height: number) => {
+                if (gridRef.current) {
+                  gridRef.current.measureInWindow(
+                    (gridX: number, gridY: number) => {
+                      const relativeX = x - gridX;
+                      const relativeY = y - gridY;
+
+                      setPopupPosition({
+                        top: relativeY - 20,
+                        left: relativeX + 5,
+                      });
+                    }
+                  );
+                }
+              }
+            );
+          }
+        }, 100);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [hoveredVideo, hoveredCardRef]);
+
+  const loadVideos = async (reset: boolean = false) => {
+    if (loading) return;
+
+    try {
+      setLoading(true);
+      const result = await fetchVideos(
+        searchQuery,
+        reset ? undefined : nextPageToken
+      );
+
+      if (reset) {
+        setVideos(result.videos);
+      } else {
+        setVideos((prev) => [...prev, ...result.videos]);
+      }
+
+      setNextPageToken(result.nextPageToken);
+    } catch (error) {
+      console.error('Failed to load videos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getNumColumns = () => {
     if (width < 600) return 1;
@@ -22,10 +96,10 @@ const VideoGrid: React.FC = () => {
   const numColumns = getNumColumns();
 
   const handleHover = (video: any, cardRef: any) => {
-    setHoveredVideo(video);
-    setHoveredCardRef(cardRef);
+    if (video && cardRef) {
+      setHoveredVideo(video);
+      setHoveredCardRef(cardRef);
 
-    if (cardRef) {
       cardRef.measureInWindow(
         (x: number, y: number, width: number, height: number) => {
           if (gridRef.current) {
@@ -35,12 +109,48 @@ const VideoGrid: React.FC = () => {
 
               setPopupPosition({
                 top: relativeY - 20,
-                left: relativeX - 20,
+                left: relativeX + 5,
               });
             });
           }
         }
       );
+
+      Animated.parallel([
+        Animated.timing(popupOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(popupScale, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(popupOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(popupScale, {
+          toValue: 0.95,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setHoveredVideo(null);
+        setHoveredCardRef(null);
+        popupScale.setValue(0.85);
+      });
+    }
+  };
+
+  const loadMore = () => {
+    if (nextPageToken && !loading) {
+      loadVideos(false);
     }
   };
 
@@ -55,9 +165,19 @@ const VideoGrid: React.FC = () => {
         )}
         keyExtractor={(item: any) => item.id}
         contentContainerStyle={styles.container}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
       />
       {hoveredVideo && (
-        <View style={styles.popupOverlay}>
+        <Animated.View
+          style={[
+            styles.popupOverlay,
+            {
+              opacity: popupOpacity,
+              transform: [{ scale: popupScale }],
+            },
+          ]}
+        >
           <View
             style={[
               styles.popupCard,
@@ -66,7 +186,7 @@ const VideoGrid: React.FC = () => {
           >
             <VideoHoverPopup video={hoveredVideo} />
           </View>
-        </View>
+        </Animated.View>
       )}
     </View>
   );
@@ -92,7 +212,7 @@ const styles = StyleSheet.create({
   },
   popupCard: {
     position: 'absolute',
-    width: 280,
+    width: 320,
     zIndex: 100000,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },

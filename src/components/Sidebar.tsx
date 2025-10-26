@@ -5,6 +5,7 @@ import Icon from './Icon';
 interface SidebarProps {
   isCollapsed: boolean;
   group?: string;
+  onItemPress?: (searchQuery: string) => void;
 }
 
 const SidebarItem = ({
@@ -51,14 +52,32 @@ const SidebarItem = ({
 
 const Separator = () => <View style={styles.separator} />;
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }: SidebarProps) => {
+const Sidebar: React.FC<SidebarProps> = ({
+  isCollapsed,
+  onItemPress,
+}: SidebarProps) => {
   const [activeItem, setActiveItem] = useState('home');
 
   const mainItems = [
-    { id: 'home', icon: 'home', label: 'Home' },
-    { id: 'explore', icon: 'explore', label: 'Explore' },
-    { id: 'shorts', icon: 'video-library', label: 'Shorts' },
-    { id: 'subscriptions', icon: 'subscriptions', label: 'Subscriptions' },
+    { id: 'home', icon: 'home', label: 'Home', searchQuery: 'programming' },
+    {
+      id: 'explore',
+      icon: 'explore',
+      label: 'Explore',
+      searchQuery: 'trending',
+    },
+    {
+      id: 'shorts',
+      icon: 'video-library',
+      label: 'Shorts',
+      searchQuery: 'shorts',
+    },
+    {
+      id: 'subscriptions',
+      icon: 'subscriptions',
+      label: 'Subscriptions',
+      searchQuery: 'tech',
+    },
   ];
 
   const libraryItems = [
@@ -72,16 +91,36 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }: SidebarProps) => {
       icon: 'music-note',
       label: 'Music',
       group: 'best-of-youtube',
+      searchQuery: 'music',
     },
-    { id: 'sports', icon: 'sports', label: 'Sports', group: 'best-of-youtube' },
+    {
+      id: 'sports',
+      icon: 'sports',
+      label: 'Sports',
+      group: 'best-of-youtube',
+      searchQuery: 'sports',
+    },
     {
       id: 'gaming',
       icon: 'sports-esports',
       label: 'Gaming',
+      searchQuery: 'gaming',
       group: 'best-of-youtube',
     },
-    { id: 'movies', icon: 'movie', label: 'Movies', group: 'best-of-youtube' },
-    { id: 'news', icon: 'article', label: 'News', group: 'best-of-youtube' },
+    {
+      id: 'movies',
+      icon: 'movie',
+      label: 'Movies',
+      group: 'best-of-youtube',
+      searchQuery: 'movies',
+    },
+    {
+      id: 'news',
+      icon: 'article',
+      label: 'News',
+      group: 'best-of-youtube',
+      searchQuery: 'news',
+    },
   ];
 
   return (
@@ -94,7 +133,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }: SidebarProps) => {
           label={item.label}
           isCollapsed={isCollapsed}
           isActive={activeItem === item.id}
-          onPress={() => setActiveItem(item.id)}
+          onPress={() => {
+            setActiveItem(item.id);
+            if (onItemPress && item.searchQuery) {
+              onItemPress(item.searchQuery);
+            }
+          }}
         />
       ))}
 
@@ -143,7 +187,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed }: SidebarProps) => {
           group={item.group}
           isCollapsed={isCollapsed}
           isActive={activeItem === item.id}
-          onPress={() => setActiveItem(item.id)}
+          onPress={() => {
+            setActiveItem(item.id);
+            if (onItemPress && item.searchQuery) {
+              onItemPress(item.searchQuery);
+            }
+          }}
         />
       ))}
     </View>

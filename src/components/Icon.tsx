@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, Text } from 'react-native';
 import {
   FaHome,
   FaCompass,
@@ -57,7 +58,11 @@ const Icon: React.FC<IconProps> = ({ name, size = 24, color = '#606060' }) => {
   const IconComponent = iconMap[name];
 
   if (!IconComponent) {
-    return <span style={{ fontSize: size, color }}>?</span>;
+    return (
+      <View>
+        <Text style={{ fontSize: size, color }}>?</Text>
+      </View>
+    );
   }
 
   return <IconComponent size={size} color={color} />;

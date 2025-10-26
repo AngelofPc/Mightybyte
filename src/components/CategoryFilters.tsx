@@ -2,25 +2,33 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 
 const categories = [
-  'All',
-  'Deep House',
-  'Playlists',
-  'Chill-out music',
-  'Live',
-  'Acoustic guitar',
-  'Music',
-  'Brazilian Music',
-  'Arrocha',
-  'History',
-  'Comedy',
-  'Sports',
-  'Gaming',
-  'Movies',
-  'News',
+  { label: 'All', searchQuery: 'programming' },
+  { label: 'Music', searchQuery: 'music' },
+  { label: 'Gaming', searchQuery: 'gaming' },
+  { label: 'News', searchQuery: 'news' },
+  { label: 'Sports', searchQuery: 'sports' },
+  { label: 'Comedy', searchQuery: 'comedy' },
+  { label: 'History', searchQuery: 'history' },
+  { label: 'Movies', searchQuery: 'movies' },
+  { label: 'Coding', searchQuery: 'coding' },
+  { label: 'Tutorials', searchQuery: 'tutorials' },
 ];
 
-const CategoryFilters: React.FC = () => {
+interface CategoryFiltersProps {
+  onCategoryChange?: (searchQuery: string) => void;
+}
+
+const CategoryFilters: React.FC<CategoryFiltersProps> = ({
+  onCategoryChange,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const handleCategoryPress = (category: (typeof categories)[0]) => {
+    setSelectedCategory(category.label);
+    if (onCategoryChange) {
+      onCategoryChange(category.searchQuery);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -31,20 +39,22 @@ const CategoryFilters: React.FC = () => {
       >
         {categories.map((category) => (
           <Pressable
-            key={category}
+            key={category.label}
             style={[
               styles.categoryButton,
-              selectedCategory === category && styles.selectedCategoryButton,
+              selectedCategory === category.label &&
+                styles.selectedCategoryButton,
             ]}
-            onPress={() => setSelectedCategory(category)}
+            onPress={() => handleCategoryPress(category)}
           >
             <Text
               style={[
                 styles.categoryText,
-                selectedCategory === category && styles.selectedCategoryText,
+                selectedCategory === category.label &&
+                  styles.selectedCategoryText,
               ]}
             >
-              {category}
+              {category.label}
             </Text>
           </Pressable>
         ))}

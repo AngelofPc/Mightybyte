@@ -7,39 +7,9 @@ interface VideoHoverPopupProps {
   video: Video;
 }
 
-const formatViews = (views: number) => {
-  if (views >= 1000000) {
-    return `${(views / 1000000).toFixed(1)}M views`;
-  }
-  if (views >= 1000) {
-    return `${(views / 1000).toFixed(0)}K views`;
-  }
-  return `${views} views`;
-};
-
-const timeSince = (date: Date) => {
-  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-  let interval = seconds / 31536000;
-  if (interval > 1) {
-    return `${Math.floor(interval)} years ago`;
-  }
-  interval = seconds / 2592000;
-  if (interval > 1) {
-    return `${Math.floor(interval)} months ago`;
-  }
-  interval = seconds / 86400;
-  if (interval > 1) {
-    return `${Math.floor(interval)} days ago`;
-  }
-  interval = seconds / 3600;
-  if (interval > 1) {
-    return `${Math.floor(interval)} hours ago`;
-  }
-  interval = seconds / 60;
-  if (interval > 1) {
-    return `${Math.floor(interval)} minutes ago`;
-  }
-  return `${Math.floor(seconds)} seconds ago`;
+const formatDate = (date: Date) => {
+  const d = new Date(date);
+  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
 };
 
 const ActionButton = ({ icon, text }: { icon: string; text: string }) => (
@@ -80,9 +50,7 @@ const VideoHoverPopup: React.FC<VideoHoverPopupProps> = ({ video }) => {
             )}
           </View>
           <Text style={styles.popupMetaInfo}>
-            {video.isLive
-              ? `${video.liveViewers} watching`
-              : `${formatViews(video.views)} • ${timeSince(video.publishedAt)}`}
+            {formatDate(video.publishedAt)}
           </Text>
         </View>
       </View>
@@ -97,23 +65,23 @@ const VideoHoverPopup: React.FC<VideoHoverPopupProps> = ({ video }) => {
 const styles = StyleSheet.create({
   popupContainer: {
     backgroundColor: '#ffffff',
-    borderRadius: 8,
-    shadowColor: 'rgba(0,0,0,0.1)',
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 10,
+    shadowColor: 'rgba(0,0,0,0.15)',
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
-    shadowRadius: 12,
+    shadowRadius: 20,
     elevation: 999,
     zIndex: 99999,
   },
   popupThumbnail: {
     width: '100%',
     aspectRatio: 16 / 9,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   popupInfoContainer: {
     flexDirection: 'row',
-    padding: 12,
+    padding: 14,
   },
   popupChannelAvatar: {
     width: 40,
@@ -153,10 +121,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
     backgroundColor: 'white',
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    margin: 6,
-    gap: 6,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    margin: 8,
+    gap: 8,
     justifyContent: 'center',
   },
   actionButton: {
@@ -164,9 +132,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
     gap: 8,
+    borderRadius: 6,
   },
   actionButtonText: {
     fontSize: 14,
